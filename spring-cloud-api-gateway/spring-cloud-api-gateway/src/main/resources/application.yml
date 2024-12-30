@@ -1,0 +1,49 @@
+spring:
+  config:
+    import: "optional:configserver:http://localhost:8071/"
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      httpclient:
+        connect-timeout: 1000
+        response-timeout: 5s
+
+
+  application:
+    name: apigateway
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    gateway:
+      enabled: true
+  info:
+    env:
+      enabled: true
+info:
+  app:
+    name: "api-gateway"
+    description: "api gateway microservice application"
+    version: "1.0.0"
+
+
+logging:
+  level:
+    com:
+      api:
+        gateway:
+          filter: DEBUG
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      slidingWindowSize: 10  # number of request will it monitor to close-> open.
+      permittedNumberOfCallsInHalfOpenState: 2  # it will allow two request on half open state.
+      failureRateThreshold: 50 # Defines the failure rate (in percentage) at which the circuit
+      #breaker will transition from closed to open.
+      waitDurationInOpenState: 10000 #Specifies the amount of time (in milliseconds)
+      #that the circuit breaker will remain open before transitioning to the half-open state to attempt recovery.

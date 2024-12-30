@@ -1,0 +1,11 @@
+spring:
+  cloud:
+    config:
+      enabled: true
+      uri: http://config-server:8071  # Adjust to match your setup
+      fail-fast: true  # Makes the application fail if config server is unreachable
+      retry:
+        max-attempts: 20  # Increases retry attempts to handle Config Server delays
+        initial-interval: 2000  # Initial retry interval in ms
+        max-interval: 10000     # Max interval in ms for exponential backoff
+        multiplier: 1.5         # Multiplier for retry backoff
