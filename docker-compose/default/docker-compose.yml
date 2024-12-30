@@ -1,0 +1,87 @@
+services:
+  config-server:
+    image: "manikandan24vm/config-server:v3"
+    container_name: config-server-ms
+    ports:
+      - "8071:8071"
+    healthcheck:
+      test: "curl --fail --silent localhost:8071/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
+
+  eureka-server:
+    image: "manikandan24vm/eureka-server-server:v3"
+    container_name: eureka-server-ms
+    ports:
+      - "8070:8070"
+    depends_on:
+      config-server:
+        condition: service_healthy
+    healthcheck:
+      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: microservice-configserver-config
+    environment:
+      SPRING_APPLICATION_NAME: "eureka-server"
+
+  user:
+    image: "manikandan24vm/user-service:v3"
+    container_name: user-service-ms
+    ports:
+      - "9091:9091"
+    environment:
+      SPRING_APPLICATION_NAME: "user"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    extends:
+      file: common-config.yml
+      service: microservice-eurekaserver-config
+
+  product:
+    image: "manikandan24vm/product-service:v3"
+    container_name: product-ms
+    ports:
+      - "9092:9092"
+    environment:
+      SPRING_APPLICATION_NAME: "product"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    extends:
+      file: common-config.yml
+      service: microservice-eurekaserver-config
+
+  orders:
+    image: "manikandan24vm/orders-service:v3"
+    container_name: orders-ms
+    ports:
+      - "9093:9093"
+    environment:
+      SPRING_APPLICATION_NAME: "orders"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    extends:
+      file: common-config.yml
+      service: microservice-eurekaserver-config
+
+networks:
+  ecommerce:
+    driver: "bridge"
