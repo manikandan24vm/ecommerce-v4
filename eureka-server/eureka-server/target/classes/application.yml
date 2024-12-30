@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: "eurekaserver"
+  config:
+    import: "optional:configserver:http://localhost:8071/"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    probes:
+      enabled: true
+    group:
+      liveness:
+        include: livenessStateProbeIndicator, diskSpace, refreshScope
+      readiness:
+        include: readinessStateProbeIndicator
